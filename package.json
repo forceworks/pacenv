@@ -1,0 +1,64 @@
+{
+  "name": "pac-environment",
+  "displayName": "PAC Environment per Project",
+  "description": "Pin and auto-apply Power Platform CLI profiles per VS Code workspace",
+  "version": "1.0.0",
+  "publisher": "Forceworks",
+  "engines": {
+    "vscode": "^1.89.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "*"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "pacEnv.selectProfile",
+        "title": "PAC Env: Select & Pin Profile (Workspace)"
+      },
+      {
+        "command": "pacEnv.applyProfile",
+        "title": "PAC Env: Apply Pinned Profile Now"
+      },
+      {
+        "command": "pacEnv.refreshStatus",
+        "title": "PAC Env: Refresh Status"
+      }
+    ],
+    "configuration": {
+      "title": "PAC Env",
+      "properties": {
+        "pacEnv.profileName": {
+          "type": "string",
+          "default": "",
+          "description": "The pac auth profile name to use for this workspace. If set, the extension will run 'pac auth select --name <profile>' on open."
+        },
+        "pacEnv.autoApplyOnOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, auto-run 'pac auth select --name <profileName>' when the workspace opens."
+        },
+        "pacEnv.readFromDotfile": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, read a .pacenv file in the workspace root for a profile name if configuration is empty."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p .",
+    "watch": "tsc -w -p .",
+    "package": "vsce package"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@types/vscode": "^1.89.0",
+    "typescript": "^5.4.0",
+    "vsce": "^2.9.3"
+  }
+}

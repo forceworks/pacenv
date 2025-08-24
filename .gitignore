@@ -1,0 +1,7 @@
+node_modules/
+out/
+*.vsix
+.vscode/
+test-workspace/
+test-parsing.js
+package-lock.json
