@@ -2,6 +2,8 @@
 
 A VS Code extension that automatically switches Power Platform CLI (`pac`) profiles when you switch between projects. Each project maintains its own pinned PAC environment profile.
 
+![PAC Environment Extension Screenshot](screenshot.png)
+
 ## Why?
 
 The `pac` CLI remembers the last selected auth profile globally. When jumping between different projects/repos, it's easy to accidentally run commands against the wrong environment. This extension fixes that by:
