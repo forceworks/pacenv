@@ -13,48 +13,41 @@ function cfg() {
 
 async function getProfiles(): Promise<{ profiles: Array<{ Name?: string; IsActive?: boolean; Index?: number }> }> {
     try {
-        // Try JSON format first
-        const { stdout } = await execAsync('pac auth list --json');
-        const profiles = JSON.parse(stdout);
-        return { profiles };
-    } catch {
-        // Fallback to text parsing
-        try {
-            const { stdout } = await execAsync('pac auth list');
-            const lines = stdout.split('\n');
-            const profiles: Array<{ Name?: string; IsActive?: boolean; Index?: number }> = [];
+        // Get PAC auth list output (JSON format not supported)
+        const { stdout } = await execAsync('pac auth list');
+        const lines = stdout.split('\n');
+        const profiles: Array<{ Name?: string; IsActive?: boolean; Index?: number }> = [];
+        
+        for (const line of lines) {
+            const trimmed = line.trim();
+            // Skip header and separator lines
+            if (!trimmed || trimmed.startsWith('Index') || trimmed.startsWith('---')) {
+                continue;
+            }
             
-            for (const line of lines) {
-                const trimmed = line.trim();
-                // Skip header and separator lines
-                if (!trimmed || trimmed.startsWith('Index') || trimmed.startsWith('---')) {
-                    continue;
-                }
+            // Check if line starts with [number]
+            const indexMatch = trimmed.match(/^\[(\d+)\]/);
+            if (indexMatch) {
+                const index = parseInt(indexMatch[1], 10);
+                const isActive = trimmed.includes('*');
                 
-                // Check if line starts with [number]
-                const indexMatch = trimmed.match(/^\[(\d+)\]/);
-                if (indexMatch) {
-                    const index = parseInt(indexMatch[1], 10);
-                    const isActive = trimmed.includes('*');
-                    
-                    // Split by "User" to get the part after it
-                    const userSplit = trimmed.split('User');
-                    if (userSplit.length >= 2) {
-                        const afterUser = userSplit[1].trim();
-                        // Split by URL pattern (starts with http)
-                        const urlMatch = afterUser.match(/^(.*?)\s+(https?:\/\/.*)$/);
-                        if (urlMatch) {
-                            const envName = urlMatch[1].trim();
-                            profiles.push({ Name: envName, IsActive: isActive, Index: index });
-                        }
+                // Split by "User" to get the part after it
+                const userSplit = trimmed.split('User');
+                if (userSplit.length >= 2) {
+                    const afterUser = userSplit[1].trim();
+                    // Split by URL pattern (starts with http)
+                    const urlMatch = afterUser.match(/^(.*?)\s+(https?:\/\/.*)$/);
+                    if (urlMatch) {
+                        const envName = urlMatch[1].trim();
+                        profiles.push({ Name: envName, IsActive: isActive, Index: index });
                     }
                 }
             }
-            return { profiles };
-        } catch (error) {
-            console.error('Failed to get PAC profiles:', error);
-            return { profiles: [] };
         }
+        return { profiles };
+    } catch (error) {
+        console.error('Failed to get PAC profiles:', error);
+        return { profiles: [] };
     }
 }
 
